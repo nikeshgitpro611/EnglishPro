@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../Auth/auth"; // Update this path to your Firebase config
 import { COLUMNS } from "../staticsComponents/managerRoleStatics";
-import { InputCell } from "../functionContents/managerRoalFn";
+import { InputCell } from "../functionContents/managerRoleFn";
 
 /** 🔹 Create Empty Row */
 const createEmptyRow = () =>
