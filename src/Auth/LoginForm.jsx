@@ -10,7 +10,7 @@ import {
 import { Visibility, VisibilityOff, Email, Lock } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/authSlice";
-import { supabase } from "../Supabase";
+import { userApi } from "../utils/dbApi";
 
 const LoginForm = ({ showToast, navigate, onSwitchToSignup }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,12 +39,8 @@ const LoginForm = ({ showToast, navigate, onSwitchToSignup }) => {
       setLoading(true);
 
       // ✅ 1. Check if email exists in database
-      const { data: users, error: queryError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email);
-
-      if (queryError) throw queryError;
+      const response = await userApi.getByEmail(email);
+      const users = response.data;
 
       if (!users || users.length === 0) {
         showToast("❌ Email not found in database", "error");

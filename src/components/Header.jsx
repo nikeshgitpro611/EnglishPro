@@ -9,8 +9,6 @@ import {
   IconButton,
   Box,
 } from "@mui/material";
-import { signOut } from "firebase/auth";
-import { auth } from "../Auth/auth";
 import { clearUser } from "../redux/authSlice";
 import ProfileMenu from "../components/ProfileMenu";
 
@@ -41,7 +39,6 @@ const Header = ({ sidebarWidth }) => {
   }, [user]);
 
   const handleLogout = async () => {
-    await signOut(auth);
     dispatch(clearUser());
     setAnchorEl(null);
     navigate("/login");

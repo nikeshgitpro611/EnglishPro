@@ -1,9 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+// Supabase is no longer used. 
+// Using JSON Server with dbApi.js instead.
+// See src/utils/dbApi.js for database operations.
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-console.log("Supabase URL:", supabaseUrl);
-console.log("Supabase ANON Key:", supabaseAnonKey);
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = null;

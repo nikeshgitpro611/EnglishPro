@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../Auth/auth"; // Update this path to your Firebase config
+import { vocabApi } from "../../utils/dbApi";
 import { COLUMNS } from "../staticsComponents/managerRoleStatics";
 import { InputCell } from "../functionContents/managerRoleFn";
 
@@ -53,25 +52,22 @@ const ManageRole = () => {
         return;
       }
 
-      // Save to Firebase
+      // Save to JSON Server
       try {
         console.log("Starting data submission...");
         console.log("Number of rows:", rows.length);
-        console.log("Database reference:", db);
 
         const promises = rows.map(async (row) => {
           try {
             const { id, ...rowData } = row;
             console.log("Saving row:", rowData);
-            return await addDoc(collection(db, "vocapsCollection"), {
+            return await vocabApi.create({
               eng: rowData.eng || "",
               hindi: rowData.hindi || "",
-              createdAt: serverTimestamp(),
+              createdAt: new Date().toISOString(),
             });
           } catch (docError) {
             console.error("Error saving document:", docError);
-            console.error("Error code:", docError.code);
-            console.error("Error message:", docError.message);
             throw new Error(`Failed to save document: ${docError.message}`);
           }
         });
@@ -81,14 +77,9 @@ const ManageRole = () => {
         alert("✅ Data submitted successfully!");
         console.log("✅ Submitted Data:", rows);
         setRows([createEmptyRow()]);
-      } catch (firebaseError) {
-        console.error("❌ Firebase error:", firebaseError);
-        console.error("Error details:", {
-          code: firebaseError.code,
-          message: firebaseError.message,
-          name: firebaseError.name,
-        });
-        alert(`❌ Database error: ${firebaseError.message}\n\nPlease check Firebase security rules.`);
+      } catch (serverError) {
+        console.error("❌ Server error:", serverError);
+        alert(`❌ Database error: ${serverError.message}`);
       }
     } catch (error) {
       console.error("Unexpected error:", error);

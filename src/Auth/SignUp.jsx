@@ -11,7 +11,7 @@ import {
 import { Visibility, VisibilityOff, Person, Lock, Email } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/authSlice';
-import { supabase } from '../Supabase';
+import { userApi } from '../utils/dbApi';
 // import bcrypt from "bcryptjs";
 
 
@@ -51,41 +51,22 @@ const Signup = ({ showToast, navigate, onSwitchToLogin }) => {
   try {
     setLoading(true);
 
-    // ✅ 1. Supabase Auth Signup
-    const { data, error } = await supabase.auth.signUp({
+    // ✅ 1. Create user in JSON Server
+    const response = await userApi.create({
+      name,
       email,
-      password,
-    //   options: {
-    //     emailRedirectTo: `${window.location.origin}/login`,
-    //   },
+      password, // In production, this should be hashed
+      role,
+      created_at: new Date().toISOString(),
     });
 
-    if (error) throw error;
+    const user = response.data;
 
-    const user = data.user;
-
-    // ⚠️ If email confirmation is enabled
-    if (!user || !data.session) {
-      showToast(
-        'Account created! Please verify your email before logging in.',
-        'success'
-      );
-
-      // Store profile info (safe even before verification)
-      await supabase.from('users').insert([
-        {
-          id: user.id,
-          name,
-          email,
-          role,
-          created_at: new Date().toISOString(),
-        },
-      ]);
-
-      return; // ⛔ STOP HERE
+    if (!user) {
+      throw new Error('Failed to create user');
     }
 
-    // ✅ 2. (Only if auto-login is enabled)
+    // ✅ 2. Auto-login user
     dispatch(
       setUser({
         uid: user.id,
@@ -105,7 +86,6 @@ const Signup = ({ showToast, navigate, onSwitchToLogin }) => {
     setLoading(false);
   }
 };
-
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
